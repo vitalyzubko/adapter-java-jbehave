@@ -1,7 +1,8 @@
 package com.epam.jbehave.utils;
 
 import com.epam.jira.core.TestResultProcessor;
-import org.jbehave.core.model.Scenario;
+import org.jbehave.core.model.Meta;
+import org.jbehave.core.model.Story;
 import org.jbehave.core.reporters.NullStoryReporter;
 import org.jbehave.core.steps.StepResult;
 
@@ -16,12 +17,21 @@ public class JIRAReporterCore extends NullStoryReporter {
 
     private static final String JIRA_KEY_NAME = "JIRATestKey";
     private final Map<String, StepResult.Type> unSuccessfulStepResults = new HashMap<>();
+    private final Map<Integer, Meta> scenarioMetas = new HashMap<>();
 
     private static boolean isJiraKeyPresentInStory = false;
     private static boolean isJiraKeyPresentInScenario;
     private static String jiraKey;
     private long scenarioStartTime;
     private String scenarioSummary;
+    private int scenarioIndex;
+
+    @Override
+    public void beforeStory(Story story, boolean givenStory) {
+        scenarioIndex = 0;
+        story.getScenarios().forEach(scenario -> scenarioMetas.put(scenarioIndex++, scenario.getMeta()));
+        scenarioIndex = 0;
+    }
 
     @Override
     public void afterStory(boolean b) {
@@ -31,15 +41,16 @@ public class JIRAReporterCore extends NullStoryReporter {
     }
 
     @Override
-    public void beforeScenario(Scenario scenario) {
-        if (scenario.hasMeta()) {
-            jiraKey = "";
-            scenarioSummary = "";
-            unSuccessfulStepResults.clear();
-            isJiraKeyPresentInScenario = scenario.getMeta().hasProperty(JIRA_KEY_NAME);
+    public void beforeScenario(String title) {
+        jiraKey = "";
+        scenarioSummary = "";
+        isJiraKeyPresentInScenario = false;
+        unSuccessfulStepResults.clear();
+        if (isNotEmpty(scenarioMetas.get(scenarioIndex))) {
+            isJiraKeyPresentInScenario = scenarioMetas.get(scenarioIndex).hasProperty(JIRA_KEY_NAME);
             if (isJiraKeyPresentInScenario) {
                 isJiraKeyPresentInStory = true;
-                jiraKey = scenario.getMeta().getProperty(JIRA_KEY_NAME).trim();
+                jiraKey = scenarioMetas.get(scenarioIndex).getProperty(JIRA_KEY_NAME).trim();
                 if (isNotEmpty(jiraKey)) {
                     scenarioStartTime = System.nanoTime();
                     TestResultProcessor.startJiraAnnotatedTest(jiraKey);
@@ -48,6 +59,7 @@ public class JIRAReporterCore extends NullStoryReporter {
                 }
             }
         }
+        scenarioIndex++;
     }
 
     @Override
@@ -66,11 +78,6 @@ public class JIRAReporterCore extends NullStoryReporter {
     @Override
     public void ignorable(String step) {
         saveUnSuccessfulStepResult(() -> unSuccessfulStepResults.put(step, StepResult.Type.IGNORABLE));
-    }
-
-    @Override
-    public void comment(String step) {
-        saveUnSuccessfulStepResult(() -> unSuccessfulStepResults.put(step, StepResult.Type.COMMENT));
     }
 
     @Override
@@ -134,7 +141,12 @@ public class JIRAReporterCore extends NullStoryReporter {
         }
     }
 
-    private static boolean isNotEmpty(String str) {
-        return !str.trim().isEmpty();
+    private static boolean isNotEmpty(Object object) {
+        if (object instanceof Meta) {
+            return !((Meta) object).isEmpty();
+        } else if (object instanceof String) {
+            return !((String) object).trim().isEmpty();
+        }
+        return false;
     }
 }

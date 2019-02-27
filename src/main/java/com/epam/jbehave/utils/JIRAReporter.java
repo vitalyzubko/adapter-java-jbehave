@@ -1,6 +1,6 @@
 package com.epam.jbehave.utils;
 
-import org.jbehave.core.model.Scenario;
+import org.jbehave.core.model.Story;
 import org.jbehave.core.reporters.NullStoryReporter;
 import org.jbehave.core.reporters.StoryReporter;
 
@@ -11,11 +11,11 @@ import java.util.*;
 
 public class JIRAReporter extends NullStoryReporter {
 
+    private static Method beforeStory;
     private static Method afterStory;
     private static Method beforeScenario;
     private static Method afterScenario;
     private static Method ignorable;
-    private static Method comment;
     private static Method pending;
     private static Method notPerformed;
     private static Method failed;
@@ -24,11 +24,11 @@ public class JIRAReporter extends NullStoryReporter {
 
     static {
         try {
+            beforeStory = JIRAReporterCore.class.getMethod("beforeStory", Story.class, Boolean.TYPE);
             afterStory = JIRAReporterCore.class.getMethod("afterStory", Boolean.TYPE);
-            beforeScenario = JIRAReporterCore.class.getMethod("beforeScenario", Scenario.class);
+            beforeScenario = JIRAReporterCore.class.getMethod("beforeScenario", String.class);
             afterScenario = JIRAReporterCore.class.getMethod("afterScenario");
             ignorable = JIRAReporterCore.class.getMethod("ignorable", String.class);
-            comment = JIRAReporterCore.class.getMethod("comment", String.class);
             pending = JIRAReporterCore.class.getMethod("pending", String.class);
             notPerformed = JIRAReporterCore.class.getMethod("notPerformed", String.class);
             failed = JIRAReporterCore.class.getMethod("failed", String.class, Throwable.class);
@@ -48,14 +48,19 @@ public class JIRAReporter extends NullStoryReporter {
     private static volatile int scenarioIndex = 0;
 
     @Override
+    public void beforeStory(Story story, boolean givenStory) {
+        delayedMethods.add(new JIRAReporter.DelayedMethod(beforeStory, story, givenStory));
+    }
+
+    @Override
     public void afterStory(boolean b) {
         delayedMethods.add(new JIRAReporter.DelayedMethod(afterStory, b));
         invokeDelayed();
     }
 
     @Override
-    public void beforeScenario(Scenario scenario) {
-        delayedMethods.add(new JIRAReporter.DelayedMethod(beforeScenario, scenario));
+    public void beforeScenario(String title) {
+        delayedMethods.add(new JIRAReporter.DelayedMethod(beforeScenario, title));
     }
 
     @Override
@@ -66,11 +71,6 @@ public class JIRAReporter extends NullStoryReporter {
     @Override
     public void ignorable(String step) {
         delayedMethods.add(new JIRAReporter.DelayedMethod(ignorable, step));
-    }
-
-    @Override
-    public void comment(String step) {
-        delayedMethods.add(new JIRAReporter.DelayedMethod(comment, step));
     }
 
     @Override
