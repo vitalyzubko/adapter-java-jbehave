@@ -45,10 +45,11 @@ public class JIRAReporter extends NullStoryReporter {
     private static final Map<Integer, Map<String, String>> scenarioParametersContainer = Collections.synchronizedMap(new HashMap<>());
     private static final List<File> stepAttachments = Collections.synchronizedList(new ArrayList<>());
     private static final Map<Integer, List<File>> scenarioAttachmentsContainer = Collections.synchronizedMap(new HashMap<>());
-    private static volatile int scenarioIndex = 0;
+    private static volatile int scenarioIndex;
 
     @Override
-    public void beforeStory(Story story, boolean givenStory) {
+    public synchronized void beforeStory(Story story, boolean givenStory) {
+        scenarioIndex = 0;
         delayedMethods.add(new JIRAReporter.DelayedMethod(beforeStory, story, givenStory));
     }
 
@@ -86,6 +87,10 @@ public class JIRAReporter extends NullStoryReporter {
     @Override
     public void failed(String step, Throwable throwable) {
         delayedMethods.add(new JIRAReporter.DelayedMethod(failed, step, throwable));
+    }
+
+    public static synchronized void saveResults() {
+        JIRAReporterCore.saveResults();
     }
 
     public static synchronized void addParameter(String title, String value) {

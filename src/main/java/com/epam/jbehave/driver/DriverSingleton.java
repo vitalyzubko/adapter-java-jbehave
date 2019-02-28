@@ -1,5 +1,6 @@
 package com.epam.jbehave.driver;
 
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -13,7 +14,7 @@ public class DriverSingleton {
     private static WebDriver driver;
     private static final String WEBDRIVER = "webdriver.chrome.driver";
     private static final String WEBDRIVER_EXE_PATH = "src/main/resources/chromedriver.exe";
-    private static long WAIT_SECONDS = 10;
+    private static long WAIT_SECONDS = 30;
 
     private DriverSingleton(){}
 
@@ -29,7 +30,7 @@ public class DriverSingleton {
     }
 
     public static void waitVisibilityOf(WebElement element) {
-        new WebDriverWait(getDriver(), WAIT_SECONDS).until(ExpectedConditions.visibilityOf(element));
+        new WebDriverWait(getDriver(), WAIT_SECONDS).ignoring(StaleElementReferenceException.class).until(ExpectedConditions.visibilityOf(element));
     }
 
     public static void closeDriver(){

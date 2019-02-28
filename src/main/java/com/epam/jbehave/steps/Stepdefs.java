@@ -9,15 +9,13 @@ import org.jbehave.core.steps.Steps;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 
-import java.io.File;
-
 public class Stepdefs extends Steps {
 
-    private WebDriver driver = DriverSingleton.getDriver();
+    private final WebDriver driver = DriverSingleton.getDriver();
 
-    @Given("I am om google main page")
-    public void givenIAmOnGoogleMainPage() {
-        driver.get("https://www.google.com/");
+    @Given("I am on page with url '$url'")
+    public void givenIAmOnYouTubeMainPage(String url) {
+        driver.navigate().to(url);
     }
 
     @When("I enter '$text'")
@@ -56,5 +54,53 @@ public class Stepdefs extends Steps {
 
         System.out.println("[expected: '" + firstSearchResult.getText() + "' contains '" + text + "'][actual: '" + firstSearchResult.getText().contains(text) + "']");
         Assert.assertTrue(firstSearchResult.getText().contains(text));
+    }
+
+    @Then("I see block with '$expectedText' text on page")
+    public void thenISeeBlockWithTextOnPage(String expectedText) {
+        WebElement block = driver.findElement(By.xpath(("//div[@id='contentBox']//h2)[1]")));
+        DriverSingleton.waitVisibilityOf(block);
+        System.out.println("[expected: '" + expectedText + "'][actual: '" + block.getText() + "']");
+        Assert.assertEquals(expectedText, block.getText());
+    }
+
+
+    @Then("I should see author name '$expectedAuthorName'")
+    public void thenIShouldSeeAuthorName(String expectedAuthorName) {
+        WebElement authorName = driver.findElement(By.xpath("//*[@id='owner-name'])[2]"));
+        DriverSingleton.waitVisibilityOf(authorName);
+        String actualAuthorName = authorName.getText();
+
+        JIRAReporter.addParameter("Author", actualAuthorName);
+
+        System.out.println("[expected: '" + expectedAuthorName + "'][actual: '" + actualAuthorName + "']");
+        Assert.assertEquals(expectedAuthorName, actualAuthorName);
+    }
+
+
+    @Then("I should see '$text' in list video")
+    public void IShouldSeeTitleInListVideo(String expectedVideoTitle) {
+        DriverSingleton.waitVisibilityOf(driver.findElement(By.xpath("(//*[@id='logo-icon-container'])[1]")));
+        WebElement videoTitle = driver.findElement(By.id("video-title"));
+        String actualVideoTitle = videoTitle.getText();
+
+        JIRAReporter.addParameter("Logo container title", actualVideoTitle);
+        JIRAReporter.addAttachment(((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE));
+
+        System.out.println("[expected: '" + expectedVideoTitle + "'][actual: '" + actualVideoTitle + "']");
+        Assert.assertEquals(expectedVideoTitle, actualVideoTitle);
+    }
+
+    @Then("see '$expectedTitle' in title")
+    public void ISeeTextInTitle(String expectedTitle) {
+        WebElement onlinerLogo = driver.findElement(By.xpath("//*[@class='header__logo']"));
+        DriverSingleton.waitVisibilityOf(onlinerLogo);
+        String actualTitle = driver.getTitle();
+
+        JIRAReporter.addParameter("epam.com title", actualTitle);
+        JIRAReporter.addAttachment(((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE));
+
+        System.out.println("[expected: '" + actualTitle + "' contains '" + expectedTitle + "'][actual: '" + actualTitle.contains(expectedTitle) + "']");
+        Assert.assertTrue(actualTitle.contains(expectedTitle));
     }
 }

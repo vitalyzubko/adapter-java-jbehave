@@ -19,7 +19,7 @@ public class JIRAReporterCore extends NullStoryReporter {
     private final Map<String, StepResult.Type> unSuccessfulStepResults = new HashMap<>();
     private final Map<Integer, Meta> scenarioMetas = new HashMap<>();
 
-    private static boolean isJiraKeyPresentInStory = false;
+    private static boolean isJiraKeyPresentInStories = false;
     private static boolean isJiraKeyPresentInScenario;
     private static String jiraKey;
     private long scenarioStartTime;
@@ -33,12 +33,17 @@ public class JIRAReporterCore extends NullStoryReporter {
         scenarioIndex = 0;
     }
 
-    @Override
-    public void afterStory(boolean b) {
-        if (isJiraKeyPresentInStory) {
-            TestResultProcessor.saveResults();
-        }
-    }
+
+
+
+//    @Override
+//    public void afterStory(boolean b) {
+//        if (isJiraKeyPresentInStories) {
+//            TestResultProcessor.saveResults();
+//        }
+//    }
+
+
 
     @Override
     public void beforeScenario(String title) {
@@ -49,7 +54,7 @@ public class JIRAReporterCore extends NullStoryReporter {
         if (isNotEmpty(scenarioMetas.get(scenarioIndex))) {
             isJiraKeyPresentInScenario = scenarioMetas.get(scenarioIndex).hasProperty(JIRA_KEY_NAME);
             if (isJiraKeyPresentInScenario) {
-                isJiraKeyPresentInStory = true;
+                isJiraKeyPresentInStories = true;
                 jiraKey = scenarioMetas.get(scenarioIndex).getProperty(JIRA_KEY_NAME).trim();
                 if (isNotEmpty(jiraKey)) {
                     scenarioStartTime = System.nanoTime();
@@ -119,6 +124,12 @@ public class JIRAReporterCore extends NullStoryReporter {
         return MINUTES.convert(duration, NANOSECONDS) + "m " +
                 SECONDS.convert(duration, NANOSECONDS) + "." +
                 MILLISECONDS.convert(duration, NANOSECONDS) + "s";
+    }
+
+    public static void saveResults() {
+        if (isJiraKeyPresentInStories) {
+            TestResultProcessor.saveResults();
+        }
     }
 
     public static void addParameter(String title, String value) {
