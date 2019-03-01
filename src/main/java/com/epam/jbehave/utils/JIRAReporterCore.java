@@ -33,18 +33,6 @@ public class JIRAReporterCore extends NullStoryReporter {
         scenarioIndex = 0;
     }
 
-
-
-
-//    @Override
-//    public void afterStory(boolean b) {
-//        if (isJiraKeyPresentInStories) {
-//            TestResultProcessor.saveResults();
-//        }
-//    }
-
-
-
     @Override
     public void beforeScenario(String title) {
         jiraKey = "";

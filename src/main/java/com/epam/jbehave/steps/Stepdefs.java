@@ -98,6 +98,7 @@ public class Stepdefs extends Steps {
         String actualTitle = driver.getTitle();
 
         JIRAReporter.addParameter("epam.com title", actualTitle);
+        JIRAReporter.addParameter("Test title", "Test value");
         JIRAReporter.addAttachment(((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE));
 
         System.out.println("[expected: '" + actualTitle + "' contains '" + expectedTitle + "'][actual: '" + actualTitle.contains(expectedTitle) + "']");

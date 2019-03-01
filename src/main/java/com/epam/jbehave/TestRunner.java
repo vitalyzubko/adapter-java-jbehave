@@ -28,7 +28,7 @@ public class TestRunner extends JUnitStories {
         JUnitReportingRunner.recommendedControls(configuredEmbedder());
         Embedder embedder = this.configuredEmbedder();
         embedder.embedderControls()
-                .useThreads(2);
+                .useThreads(1);
         embedder.runStoriesAsPaths(storyPaths());
     }
 

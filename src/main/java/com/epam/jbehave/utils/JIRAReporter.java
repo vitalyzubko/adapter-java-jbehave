@@ -12,7 +12,6 @@ import java.util.*;
 public class JIRAReporter extends NullStoryReporter {
 
     private static Method beforeStory;
-    private static Method afterStory;
     private static Method beforeScenario;
     private static Method afterScenario;
     private static Method ignorable;
@@ -25,7 +24,6 @@ public class JIRAReporter extends NullStoryReporter {
     static {
         try {
             beforeStory = JIRAReporterCore.class.getMethod("beforeStory", Story.class, Boolean.TYPE);
-            afterStory = JIRAReporterCore.class.getMethod("afterStory", Boolean.TYPE);
             beforeScenario = JIRAReporterCore.class.getMethod("beforeScenario", String.class);
             afterScenario = JIRAReporterCore.class.getMethod("afterScenario");
             ignorable = JIRAReporterCore.class.getMethod("ignorable", String.class);
@@ -55,7 +53,6 @@ public class JIRAReporter extends NullStoryReporter {
 
     @Override
     public void afterStory(boolean b) {
-        delayedMethods.add(new JIRAReporter.DelayedMethod(afterStory, b));
         invokeDelayed();
     }
 
@@ -97,7 +94,7 @@ public class JIRAReporter extends NullStoryReporter {
         stepParameters.put(Objects.requireNonNull(title), Objects.requireNonNull(value));
     }
 
-    private void processParameter(String title, String value) {
+    private void handleParameter(String title, String value) {
         new JIRAReporter.DelayedMethod(addParameter, title, value).invoke(delegate);
     }
 
@@ -105,7 +102,7 @@ public class JIRAReporter extends NullStoryReporter {
         stepAttachments.add(Objects.requireNonNull(file));
     }
 
-    private void processAttachment(File file) {
+    private void handleAttachment(File file) {
         new JIRAReporter.DelayedMethod(addAttachment, file).invoke(delegate);
     }
 
@@ -130,10 +127,10 @@ public class JIRAReporter extends NullStoryReporter {
                 delayedMethod.invoke(delegate);
                 if (delayedMethod.getMethod().equals(afterScenario)) {
                     if (scenarioParametersContainer.containsKey(scenarioCount)) {
-                        scenarioParametersContainer.get(scenarioCount).forEach(this::processParameter);
+                        scenarioParametersContainer.get(scenarioCount).forEach(this::handleParameter);
                     }
                     if (scenarioAttachmentsContainer.containsKey(scenarioCount)) {
-                        scenarioAttachmentsContainer.get(scenarioCount).forEach(this::processAttachment);
+                        scenarioAttachmentsContainer.get(scenarioCount).forEach(this::handleAttachment);
                     }
                     scenarioCount++;
                 }
