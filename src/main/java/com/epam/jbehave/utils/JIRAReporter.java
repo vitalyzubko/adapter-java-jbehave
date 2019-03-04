@@ -160,9 +160,7 @@ public class JIRAReporter extends NullStoryReporter {
         void invoke(StoryReporter delegate) {
             try {
                 method.invoke(delegate, args);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
+            } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             } catch (IllegalArgumentException e) {
                 throw new RuntimeException("" + method, e);

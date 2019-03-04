@@ -5,6 +5,8 @@ import org.jbehave.core.model.Meta;
 import org.jbehave.core.model.Story;
 import org.jbehave.core.reporters.NullStoryReporter;
 import org.jbehave.core.steps.StepResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.HashMap;
@@ -16,6 +18,8 @@ import static java.util.concurrent.TimeUnit.*;
 public class JIRAReporterCore extends NullStoryReporter {
 
     private static final String JIRA_KEY_NAME = "JIRATestKey";
+    private static final Logger LOGGER = LoggerFactory.getLogger(JIRAReporterCore.class);
+
     private final Map<String, StepResult.Type> unSuccessfulStepResults = new HashMap<>();
     private final Map<Integer, Meta> scenarioMetas = new HashMap<>();
 
@@ -48,7 +52,7 @@ public class JIRAReporterCore extends NullStoryReporter {
                     scenarioStartTime = System.nanoTime();
                     TestResultProcessor.startJiraAnnotatedTest(jiraKey);
                 } else {
-                    System.out.println("@" + JIRA_KEY_NAME + " in scenario Meta is empty");
+                    LOGGER.info("@" + JIRA_KEY_NAME + " in '" + title + "' scenario is empty");
                 }
             }
         }
@@ -125,7 +129,7 @@ public class JIRAReporterCore extends NullStoryReporter {
             if (isNotEmpty(jiraKey)) {
                 TestResultProcessor.addParameter(Objects.requireNonNull(title), Objects.requireNonNull(value));
             } else {
-                System.out.println("Parameter '" + title + "' with '" + value + "' value cannot be written for the empty @" + JIRA_KEY_NAME + " in Meta scenario");
+                LOGGER.info("Parameter '" + title +"' with '" + value + "' value cannot be written due to empty @" + JIRA_KEY_NAME);
             }
         }
     }
@@ -135,7 +139,7 @@ public class JIRAReporterCore extends NullStoryReporter {
             if (isNotEmpty(jiraKey)) {
                 TestResultProcessor.addAttachment(Objects.requireNonNull(file));
             } else {
-                System.out.println("Attachment '" + file.getName() + "' cannot be written for the empty @" + JIRA_KEY_NAME + " in Meta scenario");
+                LOGGER.info("Attachment '" + file.getName() + "' cannot be written due to empty @" + JIRA_KEY_NAME);
             }
         }
     }
