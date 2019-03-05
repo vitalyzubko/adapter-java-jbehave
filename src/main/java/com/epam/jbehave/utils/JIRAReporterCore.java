@@ -15,7 +15,7 @@ import java.util.Objects;
 
 import static java.util.concurrent.TimeUnit.*;
 
-public class JIRAReporterCore extends NullStoryReporter {
+class JIRAReporterCore extends NullStoryReporter {
 
     private static final String JIRA_KEY_NAME = "JIRATestKey";
     private static final Logger LOGGER = LoggerFactory.getLogger(JIRAReporterCore.class);
