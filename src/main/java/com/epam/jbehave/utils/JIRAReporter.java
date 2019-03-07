@@ -136,6 +136,8 @@ public class JIRAReporter extends NullStoryReporter {
                 }
             }
             delayedMethods.clear();
+            scenarioParametersContainer.clear();
+            scenarioAttachmentsContainer.clear();
         }
     }
 
