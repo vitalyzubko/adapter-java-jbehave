@@ -16,7 +16,7 @@ public class DriverSingleton {
     private static final String WEBDRIVER_EXE_PATH = "src/main/resources/chromedriver.exe";
     private static long WAIT_SECONDS = 30;
 
-    private DriverSingleton(){}
+    private DriverSingleton() {}
 
     public static WebDriver getDriver(){
         if (null == driver){

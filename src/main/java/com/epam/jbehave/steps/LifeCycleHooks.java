@@ -14,7 +14,7 @@ public class LifeCycleHooks extends Steps {
     }
 
     @AfterStories
-    public void tearDown() {
+    public void afterStoriesHook() {
         JIRAReporter.saveResults();
         DriverSingleton.closeDriver();
     }
