@@ -23,7 +23,7 @@ Add repository in `pom.xml` file:
 ```xml
 <repositories>
     <repository>
-        <id>JiraTestNG-mvn-repo</id>
+        <id>com.epam.jira</id>
         <url>https://raw.github.com/vitalyzubko/adapter-java-jbehave/mvn-repo</url>
         <snapshots>
             <enabled>true</enabled>
